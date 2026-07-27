@@ -75,7 +75,7 @@ export default function ProductDetails() {
 
           <button
             onClick={() => addItem(product)}
-            className="mt-8 w-full rounded-full bg-[#2d3a2f] px-8 py-4 font-semibold text-white transition hover:bg-[#435544] md:w-fit"
+            className="mt-8 w-full rounded-full bg-[#2d3a2f] px-8 py-4 font-semibold text-white transition hover:bg-[#435544] md:w-fit cursor-pointer"
           >
             Add to cart
           </button>
