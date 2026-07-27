@@ -6,7 +6,7 @@ import { startStandaloneServer } from "@apollo/server/standalone";
 import {
   typeDefs,
   resolvers,
-} from "./graphql/schema";
+} from "./graphql/schema.js";
 
 const server = new ApolloServer({
   typeDefs,
@@ -15,14 +15,12 @@ const server = new ApolloServer({
 
 async function startServer() {
   const { url } =
-    await startStandaloneServer(
-      server,
-      {
-        listen: {
-          port: 4000,
-        },
+    await startStandaloneServer(server, {
+      listen: {
+        port:
+          Number(process.env.PORT) || 4000,
       },
-    );
+    });
 
   console.log(
     `🚀 GraphQL server running at ${url}`,

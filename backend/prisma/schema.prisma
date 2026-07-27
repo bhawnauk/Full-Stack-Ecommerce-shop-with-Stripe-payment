@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated"
+  output   = "../src/generated/client"
 }
 
 datasource db {
@@ -14,33 +14,27 @@ model Product {
   price       Decimal
   image       String
   category    String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
   orderItems  OrderItem[]
 }
 
 model Order {
-  id                    String      @id @default(cuid())
-  stripePaymentIntentId String?     @unique
-  status                OrderStatus  @default(PENDING)
-  total                 Decimal
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
-
-  items                 OrderItem[]
+  id                     String      @id @default(cuid())
+  stripePaymentIntentId  String      @unique
+  status                 OrderStatus
+  total                  Decimal
+  createdAt              DateTime    @default(now())
+  items                  OrderItem[]
 }
 
 model OrderItem {
   id        String   @id @default(cuid())
   quantity  Int
   price     Decimal
-
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  orderId   String
+
+  product Product @relation(fields: [productId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
 }
 
 enum OrderStatus {

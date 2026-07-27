@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
 const stripe = new Stripe(
   process.env.STRIPE_SECRET_KEY!,
@@ -95,7 +95,7 @@ export const resolvers = {
 
       const lineItems = args.items.map((item) => {
         const product = products.find(
-          (product) =>
+          (product: { id: string }) =>
             product.id === item.productId,
         );
 
@@ -112,10 +112,6 @@ export const resolvers = {
             product_data: {
               name: product.name,
               images: [product.image],
-
-              metadata: {
-                productId: product.id,
-              },
             },
 
             unit_amount: Math.round(
@@ -168,7 +164,16 @@ export const resolvers = {
       }
 
       const paymentIntentId =
-        session.payment_intent as string;
+        typeof session.payment_intent ===
+        "string"
+          ? session.payment_intent
+          : session.payment_intent?.id;
+
+      if (!paymentIntentId) {
+        throw new Error(
+          "Payment intent not found",
+        );
+      }
 
       const existingOrder =
         await prisma.order.findUnique({
@@ -185,48 +190,44 @@ export const resolvers = {
       const lineItems =
         await stripe.checkout.sessions.listLineItems(
           args.sessionId,
-          {
-            expand: [
-              "data.price.product",
-            ],
-          },
         );
 
       const orderItems =
         await Promise.all(
           lineItems.data.map(
             async (lineItem) => {
-              const stripeProduct =
-                lineItem.price
-                  ?.product as Stripe.Product;
+              const productName =
+                lineItem.description;
 
-              const productId =
-                stripeProduct.metadata
-                  .productId;
+              if (!productName) {
+                throw new Error(
+                  "Stripe line item does not contain a product name",
+                );
+              }
 
               const product =
-                await prisma.product.findUnique({
+                await prisma.product.findFirst({
                   where: {
-                    id: productId,
+                    name: productName,
                   },
                 });
 
               if (!product) {
                 throw new Error(
-                  `Product not found: ${productId}`,
+                  `Product not found: ${productName}`,
                 );
               }
 
+              const quantity =
+                lineItem.quantity ?? 1;
+
               return {
                 productId: product.id,
-
-                quantity:
-                  lineItem.quantity ?? 1,
-
+                quantity,
                 price:
                   (lineItem.amount_total ?? 0) /
                   100 /
-                  (lineItem.quantity ?? 1),
+                  quantity,
               };
             },
           ),
