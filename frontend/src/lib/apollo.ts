@@ -5,7 +5,7 @@ import {
 } from "@apollo/client";
 
 const httpLink = new HttpLink({
-  uri: "Yhttps://full-stack-ecommerce-shop-with-stripe.onrender.com",
+  uri: "https://full-stack-ecommerce-shop-with-stripe.onrender.com/",
 });
 
 export const apolloClient =
