@@ -94,13 +94,17 @@ const resolvers = {
           quantity: item.quantity,
         };
       });
+      const FRONTEND_URL =
+  process.env.FRONTEND_URL!;
 
       const session = await stripe.checkout.sessions.create({
         mode: "payment",
         line_items: lineItems,
         success_url:
-          "http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url: "http://localhost:5173/cart",
+  `${FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+
+cancel_url:
+  `${FRONTEND_URL}/cart`,
       });
 
       return {
