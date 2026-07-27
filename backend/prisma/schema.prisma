@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/client"
+  output   = "../src/generated"
 }
 
 datasource db {
@@ -18,16 +18,16 @@ model Product {
 }
 
 model Order {
-  id                     String      @id @default(cuid())
-  stripePaymentIntentId  String      @unique
-  status                 OrderStatus
-  total                  Decimal
-  createdAt              DateTime    @default(now())
-  items                  OrderItem[]
+  id                    String      @id @default(cuid())
+  stripePaymentIntentId String      @unique
+  status                OrderStatus
+  total                 Decimal
+  createdAt             DateTime    @default(now())
+  items                 OrderItem[]
 }
 
 model OrderItem {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   quantity  Int
   price     Decimal
   productId String
