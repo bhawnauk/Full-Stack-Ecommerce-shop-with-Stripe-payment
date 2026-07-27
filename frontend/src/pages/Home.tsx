@@ -4,10 +4,8 @@ import ProductCard from "../components/ProductCard";
 import { GET_PRODUCTS } from "../graphql/queries";
 import type { Product } from "../types/product";
 
-
-
 export default function Home() {
-    const { data, loading, error } = useQuery<{
+  const { data, loading, error } = useQuery<{
     products: Product[];
   }>(GET_PRODUCTS);
 
