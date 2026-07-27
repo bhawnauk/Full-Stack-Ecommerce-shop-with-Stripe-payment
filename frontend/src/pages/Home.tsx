@@ -1,13 +1,22 @@
 import { Link } from "react-router-dom";
+import { useQuery } from "@apollo/client/react";
 import ProductCard from "../components/ProductCard";
-import { products } from "../data/products";
+import { GET_PRODUCTS } from "../graphql/queries";
+import type { Product } from "../types/product";
+
+
 
 export default function Home() {
+    const { data, loading, error } = useQuery<{
+    products: Product[];
+  }>(GET_PRODUCTS);
+
+  const products = data?.products ?? [];
+
   return (
     <main className="bg-[#f8f5ef]">
       {/* Hero Section */}
       <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-2 md:py-28">
-        {/* Hero Content */}
         <div>
           <p className="mb-6 text-sm font-bold uppercase tracking-[0.3em] text-[#9b6b43]">
             Small batch · Big crunch
@@ -39,7 +48,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Hero Image */}
         <div className="relative">
           <div className="overflow-hidden rounded-[3rem]">
             <img
@@ -58,32 +66,46 @@ export default function Home() {
       </section>
 
       {/* Featured Products */}
-<section className="mx-auto max-w-7xl px-6 py-24">
-  <div className="mb-12 flex items-end justify-between">
-    <div>
-      <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-[#9b6b43]">
-        The good stuff
-      </p>
+      <section className="mx-auto max-w-7xl px-6 py-24">
+        <div className="mb-12 flex items-end justify-between">
+          <div>
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-[#9b6b43]">
+              The good stuff
+            </p>
 
-      <h2 className="text-4xl font-black text-[#2d3a2f] md:text-5xl">
-        Meet the jars.
-      </h2>
-    </div>
+            <h2 className="text-4xl font-black text-[#2d3a2f] md:text-5xl">
+              Meet the jars.
+            </h2>
+          </div>
 
-    <Link
-      to="/shop"
-      className="hidden font-semibold text-[#2d3a2f] underline underline-offset-4 md:block"
-    >
-      View all products →
-    </Link>
-  </div>
+          <Link
+            to="/shop"
+            className="hidden font-semibold text-[#2d3a2f] underline underline-offset-4 md:block"
+          >
+            View all products →
+          </Link>
+        </div>
 
-  <div className="grid gap-8 md:grid-cols-3">
-    {products.map((product) => (
-      <ProductCard key={product.id} product={product} />
-    ))}
-  </div>
-</section>
+        {loading && (
+          <p className="text-[#667066]">
+            Loading pickles...
+          </p>
+        )}
+
+        {error && (
+          <p className="text-[#9b6b43]">
+            Could not load products.
+          </p>
+        )}
+
+        {!loading && !error && (
+          <div className="grid gap-8 md:grid-cols-3">
+            {products.slice(0, 3).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+      </section>
 
       {/* About Section */}
       <section id="about" className="bg-[#2d3a2f] px-6 py-24 text-white">
