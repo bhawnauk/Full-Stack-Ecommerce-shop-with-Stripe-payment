@@ -34,6 +34,7 @@ export default function Navbar() {
         </div>
 
         <Link
+          id="nav-cart-link"
           to="/cart"
           className="rounded-full bg-[#2d3a2f] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#435544]"
         >

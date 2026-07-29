@@ -5,7 +5,9 @@ import {
 } from "@apollo/client";
 
 const httpLink = new HttpLink({
-  uri: "https://full-stack-ecommerce-shop-with-stripe.onrender.com/",
+  uri: import.meta.env.DEV
+    ? "http://localhost:4000/"
+    : "https://full-stack-ecommerce-shop-with-stripe.onrender.com/",
 });
 
 export const apolloClient =
@@ -13,3 +15,4 @@ export const apolloClient =
     link: httpLink,
     cache: new InMemoryCache(),
   });
+  

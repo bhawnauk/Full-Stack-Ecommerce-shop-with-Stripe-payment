@@ -45,6 +45,14 @@ export default function ProductDetails() {
 
   const product = data.product;
 
+  const handleAddToCart = () => {
+    addItem(product);
+
+    const cartLink = document.getElementById("nav-cart-link");
+    cartLink?.scrollIntoView({ behavior: "smooth", block: "center" });
+    cartLink?.focus();
+  };
+
   return (
     <main className="min-h-screen bg-[#f8f5ef] px-6 py-16">
       <div className="mx-auto grid max-w-7xl gap-12 md:grid-cols-2">
@@ -74,7 +82,7 @@ export default function ProductDetails() {
           </p>
 
           <button
-            onClick={() => addItem(product)}
+            onClick={handleAddToCart}
             className="mt-8 w-full rounded-full bg-[#2d3a2f] px-8 py-4 font-semibold text-white transition hover:bg-[#435544] md:w-fit cursor-pointer"
           >
             Add to cart
