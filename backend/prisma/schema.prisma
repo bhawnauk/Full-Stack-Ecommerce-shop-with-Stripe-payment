@@ -23,6 +23,7 @@ model Order {
   status                OrderStatus
   total                 Decimal
   createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
   items                 OrderItem[]
 }
 
