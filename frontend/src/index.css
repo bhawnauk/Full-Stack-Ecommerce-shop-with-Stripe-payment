@@ -1,13 +1,22 @@
 @import "tailwindcss";
 
-:root {
-  font-family: Inter, system-ui, sans-serif;
-  color: #2d3a2f;
-  background: #f8f5ef;
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+
+  --color-brine: #1f2e23;
+  --color-brine-soft: #2f4535;
+  --color-paper: #fbf8f2;
+  --color-cream: #f3ecdf;
+  --color-sand: #e7dcc9;
+  --color-mustard: #e0a93b;
+  --color-clay: #a5633a;
+  --color-muted: #5f685d;
 }
 
-* {
-  box-sizing: border-box;
+:root {
+  color: var(--color-brine);
+  background: var(--color-paper);
 }
 
 html {
@@ -17,4 +26,11 @@ html {
 body {
   margin: 0;
   min-width: 320px;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-mustard);
+  color: var(--color-brine);
 }

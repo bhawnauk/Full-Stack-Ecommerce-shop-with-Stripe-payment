@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useCartStore } from "../store/cartStore";
 import { useMutation } from "@apollo/client/react";
+import ProductImage from "../components/ProductImage";
 import { CREATE_CHECKOUT_SESSION } from "../graphql/queries";
 
 interface CheckoutSession {
@@ -18,12 +19,14 @@ export default function Cart() {
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
+  const itemCount = items.reduce((total, item) => total + item.quantity, 0);
+
   const subtotal = items.reduce(
     (total, item) => total + item.price * item.quantity,
     0,
   );
 
-  const [createCheckoutSession, { loading }] =
+  const [createCheckoutSession, { loading, error }] =
     useMutation<CreateCheckoutSessionData>(CREATE_CHECKOUT_SESSION);
 
   const handleCheckout = async () => {
@@ -49,21 +52,22 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f8f5ef] px-6">
-        <div className="text-center">
-          <h1 className="text-4xl font-black text-[#2d3a2f]">
+      <main className="flex min-h-[60vh] items-center justify-center px-6 py-20">
+        <div className="max-w-md text-center">
+          <h1 className="font-display text-4xl font-semibold text-brine">
             Your cart is empty
           </h1>
 
-          <p className="mt-4 text-[#667066]">
-            Looks like you haven't added any pickles yet.
+          <p className="mt-4 leading-7 text-muted">
+            Nothing in the jar yet. Browse the range and stock up for your
+            kitchen.
           </p>
 
           <Link
             to="/shop"
-            className="mt-8 inline-block rounded-full bg-[#2d3a2f] px-7 py-4 font-semibold text-white"
+            className="mt-8 inline-block rounded-full bg-brine px-7 py-4 font-semibold text-paper transition hover:bg-brine-soft"
           >
-            Start shopping
+            Shop the range
           </Link>
         </div>
       </main>
@@ -71,105 +75,137 @@ export default function Cart() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8f5ef] px-6 py-16">
-      <div className="mx-auto max-w-7xl">
-        <h1 className="text-5xl font-black text-[#2d3a2f]">Your cart</h1>
+    <main className="mx-auto max-w-7xl px-6 py-14">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-5xl font-semibold text-brine">
+            Your cart
+          </h1>
+          <p className="mt-2 text-muted">
+            {itemCount} {itemCount === 1 ? "jar" : "jars"}
+          </p>
+        </div>
 
-        <div className="mt-12 grid gap-12 lg:grid-cols-[1fr_360px]">
-          {/* Cart Items */}
-          <div className="space-y-6">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="flex gap-6 rounded-3xl bg-white p-5 shadow-sm"
+        <Link
+          to="/shop"
+          className="font-semibold text-brine underline decoration-mustard decoration-2 underline-offset-8"
+        >
+          ← Continue shopping
+        </Link>
+      </div>
+
+      <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_380px]">
+        {/* Cart Items */}
+        <ul className="divide-y divide-sand rounded-2xl border border-sand bg-white">
+          {items.map((item) => (
+            <li key={item.id} className="flex gap-5 p-5 sm:gap-6">
+              <Link
+                to={`/product/${item.id}`}
+                className="shrink-0 overflow-hidden rounded-xl bg-cream"
               >
-                <img
+                <ProductImage
                   src={item.image}
                   alt={item.name}
-                  className="h-32 w-32 rounded-2xl object-cover"
+                  className="h-24 w-24 object-cover sm:h-28 sm:w-28"
                 />
+              </Link>
 
-                <div className="flex flex-1 flex-col justify-between">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-xl font-bold text-[#2d3a2f]">
-                        {item.name}
-                      </h2>
+              <div className="flex flex-1 flex-col justify-between">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay">
+                      {item.category}
+                    </p>
+                    <h2 className="mt-1 font-display text-xl font-semibold text-brine">
+                      {item.name}
+                    </h2>
+                    <p className="mt-1 text-sm text-muted">
+                      £{item.price.toFixed(2)} per jar
+                    </p>
+                  </div>
 
-                      <p className="mt-1 text-sm text-[#667066]">
-                        £{item.price.toFixed(2)} each
-                      </p>
-                    </div>
+                  <button
+                    type="button"
+                    onClick={() => removeItem(item.id)}
+                    className="cursor-pointer text-sm text-muted underline-offset-4 hover:text-clay hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between">
+                  <div className="flex items-center rounded-full border border-sand">
+                    <button
+                      type="button"
+                      onClick={() => decreaseQuantity(item.id)}
+                      aria-label={`Decrease ${item.name} quantity`}
+                      className="h-9 w-9 cursor-pointer text-brine"
+                    >
+                      −
+                    </button>
+
+                    <span className="w-8 text-center font-semibold">
+                      {item.quantity}
+                    </span>
 
                     <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-sm font-semibold text-[#9b6b43] hover:underline"
+                      type="button"
+                      onClick={() => increaseQuantity(item.id)}
+                      aria-label={`Increase ${item.name} quantity`}
+                      className="h-9 w-9 cursor-pointer text-brine"
                     >
-                      Remove
+                      +
                     </button>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => decreaseQuantity(item.id)}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-[#d8d0c5]"
-                      >
-                        −
-                      </button>
-
-                      <span className="w-6 text-center font-semibold">
-                        {item.quantity}
-                      </span>
-
-                      <button
-                        onClick={() => increaseQuantity(item.id)}
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-[#d8d0c5]"
-                      >
-                        +
-                      </button>
-                    </div>
-
-                    <p className="font-bold text-[#2d3a2f]">
-                      £{(item.price * item.quantity).toFixed(2)}
-                    </p>
-                  </div>
+                  <p className="font-semibold text-brine">
+                    £{(item.price * item.quantity).toFixed(2)}
+                  </p>
                 </div>
               </div>
-            ))}
+            </li>
+          ))}
+        </ul>
+
+        {/* Order Summary */}
+        <aside className="h-fit rounded-2xl bg-brine p-8 text-paper lg:sticky lg:top-24">
+          <h2 className="font-display text-2xl font-semibold">Order summary</h2>
+
+          <div className="mt-8 flex justify-between border-b border-paper/15 pb-5">
+            <span className="text-paper/70">
+              Subtotal ({itemCount} {itemCount === 1 ? "jar" : "jars"})
+            </span>
+
+            <span className="font-semibold">£{subtotal.toFixed(2)}</span>
           </div>
 
-          {/* Order Summary */}
-          <aside className="h-fit rounded-3xl bg-white p-8 shadow-sm">
-            <h2 className="text-2xl font-black text-[#2d3a2f]">
-              Order summary
-            </h2>
+          <div className="mt-5 flex justify-between text-lg">
+            <span className="font-semibold">Total</span>
 
-            <div className="mt-8 flex justify-between border-b border-[#e8dfd2] pb-5">
-              <span className="text-[#667066]">Subtotal</span>
+            <span className="font-display text-2xl font-semibold">
+              £{subtotal.toFixed(2)}
+            </span>
+          </div>
 
-              <span className="font-bold text-[#2d3a2f]">
-                £{subtotal.toFixed(2)}
-              </span>
-            </div>
+          <button
+            type="button"
+            onClick={handleCheckout}
+            disabled={loading || items.length === 0}
+            className="mt-8 w-full cursor-pointer rounded-full bg-mustard px-6 py-4 font-semibold text-brine transition hover:bg-paper disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Redirecting..." : "Proceed to checkout"}
+          </button>
 
-            <div className="mt-5 flex justify-between text-lg">
-              <span className="font-bold text-[#2d3a2f]">Total</span>
+          {error && (
+            <p role="alert" className="mt-4 text-sm text-mustard">
+              We couldn't start checkout. Please try again.
+            </p>
+          )}
 
-              <span className="font-black text-[#2d3a2f]">
-                £{subtotal.toFixed(2)}
-              </span>
-            </div>
-
-            <button
-              onClick={handleCheckout}
-              disabled={loading || items.length === 0}
-              className="mt-8 w-full rounded-full bg-[#2d3a2f] px-6 py-4 font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading ? "Redirecting..." : "Proceed to checkout"}
-            </button>
-          </aside>
-        </div>
+          <p className="mt-5 text-center text-xs text-paper/60">
+            Secure payment powered by Stripe
+          </p>
+        </aside>
       </div>
     </main>
   );

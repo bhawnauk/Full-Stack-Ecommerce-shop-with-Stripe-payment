@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useCartStore } from "../store/cartStore";
+import ProductImage from "./ProductImage";
 import type { Product } from "../types/product";
 
 interface ProductCardProps {
@@ -6,40 +9,66 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const addItem = useCartStore((state) => state.addItem);
+  const [added, setAdded] = useState(false);
+
+  useEffect(() => {
+    if (!added) return;
+
+    const timeout = setTimeout(() => setAdded(false), 1800);
+    return () => clearTimeout(timeout);
+  }, [added]);
+
+  const productUrl = `/product/${product.id}`;
+
   return (
-    <article className="group overflow-hidden rounded-3xl bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div className="aspect-square overflow-hidden bg-[#e8e0d4]">
-        <img
+    <article className="group flex flex-col overflow-hidden rounded-2xl border border-sand bg-white transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_48px_-24px_rgba(31,46,35,0.45)]">
+      <Link
+        to={productUrl}
+        className="relative block aspect-[4/5] overflow-hidden bg-cream"
+      >
+        <ProductImage
           src={product.image}
           alt={product.name}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          loading="lazy"
+          className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
         />
-      </div>
 
-      <div className="p-6">
-        <p className="mb-2 text-xs font-bold uppercase tracking-widest text-[#9b6b43]">
+        <span className="absolute left-4 top-4 rounded-full bg-paper/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brine backdrop-blur">
           {product.category}
-        </p>
+        </span>
+      </Link>
 
-        <h3 className="text-xl font-bold text-[#2d3a2f]">
-          {product.name}
-        </h3>
+      <div className="flex flex-1 flex-col p-5">
+        <Link to={productUrl}>
+          <h3 className="font-display text-xl font-semibold leading-snug text-brine">
+            {product.name}
+          </h3>
+        </Link>
 
-        <p className="mt-2 text-sm leading-6 text-[#6c746b]">
+        <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted">
           {product.description}
         </p>
 
-        <div className="mt-6 flex items-center justify-between">
-          <span className="text-lg font-bold text-[#2d3a2f]">
+        <div className="mt-auto flex items-center justify-between gap-3 pt-6">
+          <span className="text-lg font-semibold text-brine">
             £{product.price.toFixed(2)}
           </span>
 
-          <Link
-            to={`/product/${product.id}`}
-            className="rounded-full border border-[#2d3a2f] px-4 py-2 text-sm font-semibold text-[#2d3a2f] transition hover:bg-[#2d3a2f] hover:text-white"
+          <button
+            type="button"
+            onClick={() => {
+              addItem(product);
+              setAdded(true);
+            }}
+            className={`cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${
+              added
+                ? "bg-mustard text-brine"
+                : "bg-brine text-paper hover:bg-brine-soft"
+            }`}
           >
-            View product
-          </Link>
+            {added ? "Added ✓" : "Add to cart"}
+          </button>
         </div>
       </div>
     </article>
