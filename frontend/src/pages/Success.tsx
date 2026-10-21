@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useMutation } from "@apollo/client/react";
 import { useCartStore } from "../store/cartStore";
 import { CREATE_PAID_ORDER } from "../graphql/queries";
+import PickleLoader from "../components/PickleLoader";
 
 interface CreatePaidOrderData {
   createPaidOrder: {
@@ -51,11 +52,15 @@ export default function Success() {
     return (
       <main className="flex min-h-[60vh] items-center justify-center px-6 py-20">
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-sand border-t-brine" />
+          <h1 className="sr-only">Confirming your payment</h1>
 
-          <h1 className="mt-8 font-display text-3xl font-semibold text-brine">
-            Confirming your payment...
-          </h1>
+          <PickleLoader
+            messages={[
+              "Confirming your payment…",
+              "Packing your jars…",
+              "Writing your order slip…",
+            ]}
+          />
 
           <p className="mt-4 text-muted">
             Please wait while we confirm your order.

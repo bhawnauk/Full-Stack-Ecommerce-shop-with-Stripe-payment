@@ -6,9 +6,10 @@ import type { Product } from "../types/product";
 
 interface ProductCardProps {
   product: Product;
+  index?: number;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
   const [added, setAdded] = useState(false);
 
@@ -22,7 +23,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   const productUrl = `/product/${product.id}`;
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-sand bg-white transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_48px_-24px_rgba(31,46,35,0.45)]">
+    <article
+      style={{ animationDelay: `${index * 70}ms` }}
+      className="group flex animate-fade-up flex-col overflow-hidden rounded-2xl border border-sand bg-white transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_48px_-24px_rgba(31,46,35,0.45)]"
+    >
       <Link
         to={productUrl}
         className="relative block aspect-[4/5] overflow-hidden bg-cream"

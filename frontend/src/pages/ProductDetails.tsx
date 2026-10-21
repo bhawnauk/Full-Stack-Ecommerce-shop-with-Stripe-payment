@@ -4,6 +4,7 @@ import { useQuery } from "@apollo/client/react";
 import { GET_PRODUCT } from "../graphql/queries";
 import { useCartStore } from "../store/cartStore";
 import ProductImage from "../components/ProductImage";
+import PickleLoader from "../components/PickleLoader";
 import { TRADE_MAILTO } from "../config";
 import type { Product } from "../types/product";
 
@@ -32,13 +33,21 @@ export default function ProductDetails() {
 
   if (loading) {
     return (
-      <main className="mx-auto grid max-w-7xl animate-pulse gap-12 px-6 py-12 lg:grid-cols-2">
-        <div className="aspect-square rounded-[2rem] bg-cream" />
+      <main className="mx-auto grid max-w-7xl gap-12 px-6 py-12 lg:grid-cols-2">
+        <div className="shimmer relative grid aspect-square place-items-center rounded-[2rem]">
+          <PickleLoader
+            messages={[
+              "Fetching your jar…",
+              "Checking the crunch…",
+              "Reading the label…",
+            ]}
+          />
+        </div>
         <div className="space-y-5 py-8">
-          <div className="h-4 w-24 rounded bg-cream" />
-          <div className="h-12 w-3/4 rounded bg-cream" />
-          <div className="h-5 w-full rounded bg-cream" />
-          <div className="h-5 w-2/3 rounded bg-cream" />
+          <div className="shimmer h-4 w-24 rounded" />
+          <div className="shimmer h-12 w-3/4 rounded" />
+          <div className="shimmer h-5 w-full rounded" />
+          <div className="shimmer h-5 w-2/3 rounded" />
         </div>
       </main>
     );

@@ -191,9 +191,29 @@ export default function Cart() {
             type="button"
             onClick={handleCheckout}
             disabled={loading || items.length === 0}
-            className="mt-8 w-full cursor-pointer rounded-full bg-mustard px-6 py-4 font-semibold text-brine transition hover:bg-paper disabled:cursor-not-allowed disabled:opacity-60"
+            aria-busy={loading}
+            className="mt-8 w-full cursor-pointer rounded-full bg-mustard px-6 py-4 font-semibold text-brine transition hover:bg-paper disabled:cursor-not-allowed disabled:opacity-60 aria-busy:cursor-wait aria-busy:opacity-100"
           >
-            {loading ? "Redirecting..." : "Proceed to checkout"}
+            {loading ? (
+              <span className="inline-flex items-center justify-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="h-5 w-5 animate-spin rounded-full border-[3px] border-brine/25 border-t-brine"
+                />
+                Packing your jars
+                <span aria-hidden="true" className="inline-flex gap-1">
+                  {[0, 150, 300].map((delay) => (
+                    <span
+                      key={delay}
+                      className="h-1.5 w-1.5 animate-bounce rounded-full bg-brine"
+                      style={{ animationDelay: `${delay}ms` }}
+                    />
+                  ))}
+                </span>
+              </span>
+            ) : (
+              "Proceed to checkout"
+            )}
           </button>
 
           {error && (
